@@ -17,6 +17,7 @@ public class UserController {
 
     @GetMapping
     public Collection<User> findAll() {
+        log.info("Получен запрос GET /users");
         return users.values();
     }
 

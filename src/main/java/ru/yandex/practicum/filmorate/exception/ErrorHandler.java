@@ -13,6 +13,13 @@ import java.util.NoSuchElementException;
 @RestControllerAdvice
 public class ErrorHandler {
 
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Map<String, String> handleException(Exception e) {
+        log.error("Внутренняя ошибка сервера", e);
+        return Map.of("error", "Внутренняя ошибка сервера", "message", String.valueOf(e.getMessage()));
+    }
+
     @ExceptionHandler({ValidationException.class, MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleValidation(Exception e) {

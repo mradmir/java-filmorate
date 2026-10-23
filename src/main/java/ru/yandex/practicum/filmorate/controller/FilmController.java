@@ -21,6 +21,7 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> findAll() {
+        log.info("Получен запрос GET /films");
         return films.values();
     }
 
@@ -47,7 +48,7 @@ public class FilmController {
     }
 
     private void validateReleaseDate(Film film) {
-        if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(MIN_RELEASE_DATE)) {
+        if (film.getReleaseDate().isBefore(MIN_RELEASE_DATE)) {
             log.warn("Некорректная дата релиза: {}", film.getReleaseDate());
             throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
         }

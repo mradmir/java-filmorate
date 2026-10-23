@@ -116,5 +116,19 @@ class ModelValidationTest {
         f.setReleaseDate(LocalDate.of(1895, 12, 28));
         assertDoesNotThrow(() -> c.create(f));
     }
+
+    @Test
+    void nullReleaseDateFails() {
+        Film f = validFilm();
+        f.setReleaseDate(null);
+        assertFalse(validator.validate(f).isEmpty());
+    }
+
+    @Test
+    void nullBirthdayFails() {
+        User u = validUser();
+        u.setBirthday(null);
+        assertFalse(validator.validate(u).isEmpty());
+    }
 }
 

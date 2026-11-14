@@ -2,12 +2,14 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
@@ -21,14 +23,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film findById(int id) {
-        Film film = films.get(id);
-
-        if (film == null) {
-            throw new NotFoundException("Фильм не найден: " + id);
-        }
-
-        return film;
+    public Optional<Film> findById(int id) {
+        return Optional.ofNullable(films.get(id));
     }
 
     @Override
@@ -40,15 +36,28 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) {
-        Film oldFilm = findById(film.getId());
-        film.setLikes(oldFilm.getLikes());
+        Film oldFilm = films.get(film.getId());
+
+        if (oldFilm != null) {
+            film.setLikes(oldFilm.getLikes());
+        }
+
         films.put(film.getId(), film);
         return film;
     }
 
     @Override
     public void delete(int id) {
-        findById(id);
         films.remove(id);
+    }
+
+    @Override
+    public List<Film> findPopular(int count) {
+        return films.values().stream()
+                .sorted(Comparator.comparingInt(
+                        (Film film) -> film.getLikes().size()
+                ).reversed())
+                .limit(count)
+                .toList();
     }
 }

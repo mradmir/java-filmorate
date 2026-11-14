@@ -8,6 +8,13 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+
+
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -105,16 +112,23 @@ class ModelValidationTest {
 
     @Test
     void releaseDateBoundary() {
-        FilmController c = new FilmController();
+
+        FilmStorage filmStorage = new InMemoryFilmStorage();
+        UserStorage userStorage = new InMemoryUserStorage();
+
+        FilmService filmService = new FilmService(filmStorage, userStorage);
+
+        FilmController controller = new FilmController(filmService);
+
         Film f = new Film();
         f.setName("Old");
         f.setDuration(10);
 
         f.setReleaseDate(LocalDate.of(1895, 12, 27));
-        assertThrows(ValidationException.class, () -> c.create(f));
+        assertThrows(ValidationException.class, () -> controller.create(f));
 
         f.setReleaseDate(LocalDate.of(1895, 12, 28));
-        assertDoesNotThrow(() -> c.create(f));
+        assertDoesNotThrow(() -> controller.create(f));
     }
 
     @Test
